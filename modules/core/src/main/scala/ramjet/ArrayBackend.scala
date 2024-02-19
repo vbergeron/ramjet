@@ -51,4 +51,12 @@ object ArrayBackend extends Backend[Float, ArrayBackend.T] {
         out
       }
       case _ => throw IllegalArgumentException()
+
+  def transpose(lhs: T): T =
+    // naive implementation that allocates
+    val out = T(new Array[Float](lhs.dims(0) * lhs.dims(1)), Array(lhs.dims(1), lhs.dims(0)))
+    (0 until lhs.dims(0)).foreach: i =>
+      (0 until lhs.dims(1)).foreach: j =>
+        out.set(j, i, lhs.get(i, j))
+    out
 }

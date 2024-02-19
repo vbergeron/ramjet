@@ -8,20 +8,9 @@ import compiletime.ops.any.ToString as Str
 
 object Dim {
 
-  inline def apply[I <: Int, J <: Int]: (I, J) =
-    constValueTuple[(I, J)]
-
   // helper to format dimentions to a readable string
   inline def fmt[I <: Int]: "[" + Str[I] + "]" = constValue
   inline def fmt[I <: Int, J <: Int]: "[" + Str[I] + ", " + Str[J] + "]" = constValue
-
-  // Get the maximum number of elements of a 2 dim tensor
-  inline def elems[I <: Int, J <: Int]: I * J = constValue
-
-  // Compute the offset using the 2 indices
-  inline def offset[I <: Int](i: Int, j: Int): Int =
-    inline val I = constValue[I]
-    i * I + j
 
   // Checks if we can reshape an 2d tensor into another one
   inline def checkT2toT2[N <: Int, M <: Int, P <: Int, Q <: Int]: Boolean =

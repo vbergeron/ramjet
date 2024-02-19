@@ -56,5 +56,8 @@ final class TensorAPI[Scalar, Tensor](back: Backend[Scalar, Tensor]) {
       inline Dim.checkT2toT1[N, M, q.type] match
         case true => lhs
 
+    inline def t: T2[M, N] =
+      back.transpose(lhs)
+
     inline def unwrap: Tensor = lhs
 }
