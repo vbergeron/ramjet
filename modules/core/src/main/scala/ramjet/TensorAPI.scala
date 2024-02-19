@@ -1,5 +1,7 @@
 package ramjet
 
+import scala.reflect.ClassTag
+
 final class TensorAPI[Scalar, Tensor](back: Backend[Scalar, Tensor]) {
 
   opaque type T0 = Scalar
@@ -15,6 +17,14 @@ final class TensorAPI[Scalar, Tensor](back: Backend[Scalar, Tensor]) {
   inline def unsafe(n: Int, m: Int)(data: Array[Scalar]): T2[n.type, m.type] =
     require(data.length == n * m, s"Provided array was not of size ${n * m}")
     back.unsafe(data, Array(n, m))
+
+  // Wraps a float array into a tensor
+  inline def fill(n: Int)(x: Scalar)(using ClassTag[Scalar]): T1[n.type] =
+    unsafe(n)(Array.fill(n)(x))
+
+  // Wraps a float array into a tensor
+  inline def fill(n: Int, m: Int)(x: Scalar)(using ClassTag[Scalar]): T2[n.type, m.type] =
+    unsafe(n, m)(Array.fill(n * m)(x))
 
   extension (x: T0) inline def unwrap: Scalar = x
 
