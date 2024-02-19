@@ -4,7 +4,7 @@ import compiletime.*
 import compiletime.ops.any.*
 import compiletime.ops.string.*
 import compiletime.ops.int.`*`
-import compiletime.ops.int.ToString as Str
+import compiletime.ops.any.ToString as Str
 
 object Dim {
 
@@ -42,10 +42,8 @@ object Dim {
 
   // Checks if 2 2d tensors can be multiplied together
   inline def checkT2xT2[N <: Int, M <: Int, P <: Int, Q <: Int]: Boolean =
-    inline val N: Int = constValue[N]
     inline val M: Int = constValue[M]
     inline val P: Int = constValue[P]
-    inline val Q: Int = constValue[Q]
 
     inline if M == P then true
     else error("Wrong tensor format: " + fmt[N, M] + " x " + fmt[P, Q])
@@ -60,14 +58,12 @@ object Dim {
   inline def checkT1xT2[N <: Int, P <: Int, Q <: Int]: Boolean =
     inline val N: Int = constValue[N]
     inline val P: Int = constValue[P]
-    inline val Q: Int = constValue[Q]
 
     inline if N == P then true
     else error("Wrong tensor format: " + fmt[N] + " x " + fmt[P, Q])
 
   // Checks if 2 2d tensors can be multiplied together
   inline def checkT2xT1[N <: Int, M <: Int, Q <: Int]: Boolean =
-    inline val N: Int = constValue[N]
     inline val M: Int = constValue[M]
     inline val Q: Int = constValue[Q]
 

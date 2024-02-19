@@ -1,10 +1,11 @@
 import ramjet.*
 
-@main def run =
-  def foo = Tensor.unsafe(2, 2)(Array(3, 4, 2, 1))
-  def bar = Tensor.unsafe(2, 2)(Array(1, 2, 3, 4))
-  def res = foo * bar * foo
+@main def run: Unit =
 
-  println(res.unwrap.mkString(", "))
+  val dsl = ArrayBackend.api
+  import dsl.*
 
-  // println(res.dim.fmt)
+  val foo = unsafe(2, 2)(Array(0f, 1f, 1f, 0f))
+  val bar = unsafe(2, 2)(Array(1f, 1f, 0f, 0f))
+  val res = foo * bar * foo
+  println(res.unwrap.data.mkString(", "))

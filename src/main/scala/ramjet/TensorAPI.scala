@@ -3,23 +3,23 @@ package ramjet
 import compiletime.*
 import compiletime.ops.int.*
 
-final class TensorAPI(val back: Backend) {
+final class TensorAPI[Scalar, Tensor](back: Backend[Scalar, Tensor]) {
 
-  opaque type T0 = back.Scalar
-  opaque type T1[N <: Int] = back.Tensor
-  opaque type T2[N <: Int, M <: Int] = back.Tensor
+  opaque type T0 = Scalar
+  opaque type T1[N <: Int] = Tensor
+  opaque type T2[N <: Int, M <: Int] = Tensor
 
   // Wraps a float array into a tensor
-  inline def unsafe(n: Int)(data: Array[T0]): T1[n.type] =
+  inline def unsafe(n: Int)(data: Array[Scalar]): T1[n.type] =
     require(data.length == n, s"Provided array was not of size $n")
-    back.unsafe(data)
+    back.unsafe(data, Array(n))
 
   // Wraps a float array into a tensor
-  inline def unsafe(n: Int, m: Int)(data: Array[T0]): T2[n.type, m.type] =
+  inline def unsafe(n: Int, m: Int)(data: Array[Scalar]): T2[n.type, m.type] =
     require(data.length == n * m, s"Provided array was not of size ${n * m}")
-    back.unsafe(data)
+    back.unsafe(data, Array(n, m))
 
-  extension (x: T0) inline def unwrap: back.Scalar = x
+  extension (x: T0) inline def unwrap: Scalar = x
 
   extension [N <: Int](lhs: T1[N])
 
@@ -37,7 +37,7 @@ final class TensorAPI(val back: Backend) {
       inline Dim.checkT1toT2[N, p.type, q.type] match
         case true => lhs
 
-    inline def unwrap: back.Tensor = lhs
+    inline def unwrap: Tensor = lhs
 
   extension [N <: Int, M <: Int](lhs: T2[N, M])
 
@@ -59,5 +59,5 @@ final class TensorAPI(val back: Backend) {
       inline Dim.checkT2toT1[N, M, q.type] match
         case true => lhs
 
-    inline def unwrap: back.Tensor = lhs
+    inline def unwrap: Tensor = lhs
 }

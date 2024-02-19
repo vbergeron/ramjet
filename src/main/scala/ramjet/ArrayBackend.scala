@@ -1,6 +1,6 @@
 package ramjet
 
-object ArrayBackend extends Backend {
+object ArrayBackend extends Backend[Float, ArrayBackend.T] {
 
   final case class T(data: Array[Float], dims: Array[Int]):
     inline def get(x: Int, y: Int): Float = data(x * dims(0) + y)
@@ -9,10 +9,10 @@ object ArrayBackend extends Backend {
   type Scalar = Float
   type Tensor = T
 
-  def unsafe(data: Array[Scalar]): Tensor =
+  def unsafe(data: Array[Scalar], dims: Array[Int]): Tensor =
     val out = new Array[Float](data.length)
     System.arraycopy(data, 0, out, 0, data.length)
-    T(out, Array(out.length))
+    T(out, dims)
 
   def scalarProduct(lhs: Tensor, rhs: Tensor): Scalar =
     var out = 0f
