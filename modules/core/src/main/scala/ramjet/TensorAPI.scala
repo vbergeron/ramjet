@@ -47,6 +47,14 @@ final class TensorAPI[Scalar, Tensor](back: Backend[Scalar, Tensor]) {
       inline Dim.checkT1toT2[N, p.type, q.type] match
         case true => lhs
 
+    inline def append0[P <: Int, Q <: Int](rhs: T2[P, Q]): T2[P + 1, Q] =
+      inline Dim.checkT1appendT2[N, P, Q](0) match
+        case true => back.append(lhs, rhs, 0)
+
+    inline def append1[P <: Int, Q <: Int](rhs: T2[P, Q]): T2[P, Q + 1] =
+      inline Dim.checkT1appendT2[N, P, Q](1) match
+        case true => back.append(lhs, rhs, 1)
+
     inline def d0: N = constValue
 
     inline def unwrap: Tensor = lhs

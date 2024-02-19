@@ -53,17 +53,26 @@ object Dim {
     inline axis match
       case 0 =>
         inline if constValue[M == Q] then true
-        else error("Wrong tensor format: " + fmt[N, M] + " append " + fmt[Q] + "on rows")
+        else error(fmt[N, M] + " does not have " + fmt[Q] + " columns")
       case 1 =>
         inline if constValue[N == Q] then true
-        else error("Wrong tensor format: " + fmt[N, M] + " append " + fmt[Q] + "on cols")
+        else error(fmt[N, M] + " does not have " + fmt[Q] + " lines")
 
   inline def checkT2appendT2[N <: Int, M <: Int, P <: Int, Q <: Int](axis: 0 | 1): Boolean =
     inline axis match
       case 0 =>
         inline if constValue[M == Q] then true
-        else error("Wrong tensor format: " + fmt[N, M] + " append " + fmt[P, Q] + "on rows")
+        else error(fmt[N, M] + " and " + fmt[P, Q] + " have not the same number of columns")
       case 1 =>
         inline if constValue[N == P] then true
-        else error("Wrong tensor format: " + fmt[N, M] + " append " + fmt[P, Q] + "on cols")
+        else error(fmt[N, M] + " and " + fmt[P, Q] + " have not the same number of lines")
+
+  inline def checkT1appendT2[N <: Int, P <: Int, Q <: Int](axis: 0 | 1): Boolean =
+    inline axis match
+      case 0 =>
+        inline if constValue[N == Q] then true
+        else error(fmt[P, Q] + " does not have " + fmt[N] + " columns")
+      case 1 =>
+        inline if constValue[N == P] then true
+        else error(fmt[P, Q] + " does not have " + fmt[N] + " lines")
 }
