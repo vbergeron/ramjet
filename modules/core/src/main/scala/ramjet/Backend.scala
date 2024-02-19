@@ -6,5 +6,5 @@ trait Backend[Scalar, Tensor] {
   def scalarProduct(lhs: Tensor, rhs: Tensor): Scalar
   def tensorProduct(lhs: Tensor, rhs: Tensor): Tensor
 
-  final inline def api: TensorAPI[Scalar, Tensor] = TensorAPI(this)
+  final val api: TensorAPI[Scalar, Tensor] = TensorAPI(this)
 }

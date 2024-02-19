@@ -1,8 +1,5 @@
 package ramjet
 
-import compiletime.*
-import compiletime.ops.int.*
-
 final class TensorAPI[Scalar, Tensor](back: Backend[Scalar, Tensor]) {
 
   opaque type T0 = Scalar
