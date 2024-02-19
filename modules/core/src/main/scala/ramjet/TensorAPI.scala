@@ -1,6 +1,8 @@
 package ramjet
 
-import scala.reflect.ClassTag
+import reflect.ClassTag
+import compiletime.*
+import compiletime.ops.int.*
 
 final class TensorAPI[Scalar, Tensor](back: Backend[Scalar, Tensor]) {
 
@@ -28,6 +30,7 @@ final class TensorAPI[Scalar, Tensor](back: Backend[Scalar, Tensor]) {
 
   extension (x: T0) inline def unwrap: Scalar = x
 
+  /* 1D Tensor API */
   extension [N <: Int](lhs: T1[N])
 
     inline def *[P <: Int, Q <: Int](rhs: T2[P, Q]): T1[P] =
@@ -44,8 +47,11 @@ final class TensorAPI[Scalar, Tensor](back: Backend[Scalar, Tensor]) {
       inline Dim.checkT1toT2[N, p.type, q.type] match
         case true => lhs
 
+    inline def d0: N = constValue
+
     inline def unwrap: Tensor = lhs
 
+  /* 2D Tensor API */
   extension [N <: Int, M <: Int](lhs: T2[N, M])
 
     inline def *[P <: Int, Q <: Int](rhs: T2[P, Q]): T2[N, Q] =
@@ -66,8 +72,31 @@ final class TensorAPI[Scalar, Tensor](back: Backend[Scalar, Tensor]) {
       inline Dim.checkT2toT1[N, M, q.type] match
         case true => lhs
 
+    inline def append0[Q <: Int](rhs: T1[Q]): T2[N + 1, M] =
+      inline Dim.checkT2appendT1[N, M, Q](0) match
+        case true => back.append(lhs, rhs, 0)
+
+    inline def append1[P <: Int](rhs: T1[P]): T2[N, M + 1] =
+      inline Dim.checkT2appendT1[N, M, P](1) match
+        case true => back.append(lhs, rhs, 1)
+
+    inline def append0[P <: Int, Q <: Int](rhs: T2[P, Q]): T2[N + P, M] =
+      inline Dim.checkT2appendT2[N, M, P, Q](0) match
+        case true => back.append(lhs, rhs, 0)
+
+    inline def append1[P <: Int, Q <: Int](rhs: T2[P, Q]): T2[N, M + Q] =
+      inline Dim.checkT2appendT2[N, M, P, Q](1) match
+        case true => back.append(lhs, rhs, 1)
+
     inline def t: T2[M, N] =
       back.transpose(lhs)
+
+    inline def inv: T2[N, M] =
+      inline Dim.checkSquare[N, M] match
+        case true => back.invert(lhs)
+
+    inline def d0: N = constValue
+    inline def d1: M = constValue
 
     inline def unwrap: Tensor = lhs
 }

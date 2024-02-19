@@ -19,5 +19,11 @@ trait Backend[Scalar, Tensor] {
 
   def transpose(lhs: Tensor): Tensor
 
+  /* When called we knows the matrix is square */
+  def invert(lhs: Tensor): Tensor
+
+  def append(lhs: Tensor, rhs: Tensor, axis: Int): Tensor
+
   final val api: TensorAPI[Scalar, Tensor] = TensorAPI(this)
+
 }

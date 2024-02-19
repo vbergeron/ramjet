@@ -59,4 +59,8 @@ object ArrayBackend extends Backend[Float, ArrayBackend.T] {
       (0 until lhs.dims(1)).foreach: j =>
         out.set(j, i, lhs.get(i, j))
     out
+
+  def invert(lhs: T): T = ???
+
+  def append(lhs: T, rhs: T, axis: Int): T = ???
 }
