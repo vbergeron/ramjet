@@ -31,6 +31,10 @@ final class TensorAPI[Tensor](back: Backend[Tensor]) {
   inline def fill[T <: Scalar](n: Int, m: Int)(x: T)(using ClassTag[T]): T2[T, n.type, m.type] =
     unsafe(n, m)(Array.fill(n * m)(x))
 
+  type Select1[I <: 0 | 1, Case0, Case1] = I match
+    case 0 => Case0
+    case 1 => Case1
+
   /* 1D Tensor API */
   extension [T <: Scalar, N <: Int](lhs: T1[T, N])
 
@@ -55,6 +59,18 @@ final class TensorAPI[Tensor](back: Backend[Tensor]) {
     inline def append1[P <: Int, Q <: Int](rhs: T2[T, P, Q]): T2[T, P, Q + 1] =
       inline Dim.checkT1appendT2[N, P, Q](1) match
         case true => back.append(lhs, rhs, 1)
+
+    inline def append[P <: Int, Q <: Int](
+        rhs: T2[T, P, Q],
+        axis: 0 | 1
+    ): Select1[axis.type, T2[T, P + 1, Q], T2[T, P, Q + 1]] =
+      inline axis match
+        case 0 =>
+          inline Dim.checkT1appendT2[N, P, Q](0) match
+            case true => back.append(lhs, rhs, 0).asInstanceOf
+        case 1 =>
+          inline Dim.checkT1appendT2[N, P, Q](1) match
+            case true => back.append(lhs, rhs, 1).asInstanceOf
 
     inline def d0: N = constValue
 
@@ -81,21 +97,29 @@ final class TensorAPI[Tensor](back: Backend[Tensor]) {
       inline Dim.checkT2toT1[N, M, q.type] match
         case true => back.reshape(lhs, Array(q))
 
-    inline def append0[Q <: Int](rhs: T1[T, Q]): T2[T, N + 1, M] =
-      inline Dim.checkT2appendT1[N, M, Q](0) match
-        case true => back.append(lhs, rhs, 0)
+    inline def append[Q <: Int](
+        rhs: T1[T, Q],
+        axis: 0 | 1
+    ): Select1[axis.type, T2[T, N + 1, M], T2[T, N, M + 1]] =
+      inline axis match
+        case 0 =>
+          inline Dim.checkT2appendT1[N, M, Q](0) match
+            case true => back.append(lhs, rhs, 0).asInstanceOf // safe since we checked
+        case 1 =>
+          inline Dim.checkT2appendT1[N, M, Q](1) match
+            case true => back.append(lhs, rhs, 1).asInstanceOf // safe since we checked
 
-    inline def append1[P <: Int](rhs: T1[T, P]): T2[T, N, M + 1] =
-      inline Dim.checkT2appendT1[N, M, P](1) match
-        case true => back.append(lhs, rhs, 1)
-
-    inline def append0[P <: Int, Q <: Int](rhs: T2[T, P, Q]): T2[T, N + P, M] =
-      inline Dim.checkT2appendT2[N, M, P, Q](0) match
-        case true => back.append(lhs, rhs, 0)
-
-    inline def append1[P <: Int, Q <: Int](rhs: T2[T, P, Q]): T2[T, N, M + Q] =
-      inline Dim.checkT2appendT2[N, M, P, Q](1) match
-        case true => back.append(lhs, rhs, 1)
+    inline def append[P <: Int, Q <: Int](
+        rhs: T2[T, P, Q],
+        axis: 0 | 1
+    ): Select1[axis.type, T2[T, N + P, M], T2[T, N, M + Q]] =
+      inline axis match
+        case 0 =>
+          inline Dim.checkT2appendT2[N, M, P, Q](0) match
+            case true => back.append(lhs, rhs, 0).asInstanceOf // safe since we checked
+        case 1 =>
+          inline Dim.checkT2appendT2[N, M, P, Q](1) match
+            case true => back.append(lhs, rhs, 1).asInstanceOf // safe since we checked
 
     inline def t: T2[T, M, N] =
       back.transpose(lhs)
