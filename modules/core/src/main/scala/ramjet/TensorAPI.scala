@@ -52,14 +52,6 @@ final class TensorAPI[Tensor](back: Backend[Tensor]) {
       inline Dim.checkT1toT2[N, p.type, q.type] match
         case true => back.reshape(lhs, Array(p, q))
 
-    inline def append0[P <: Int, Q <: Int](rhs: T2[T, P, Q]): T2[T, P + 1, Q] =
-      inline Dim.checkT1appendT2[N, P, Q](0) match
-        case true => back.append(lhs, rhs, 0)
-
-    inline def append1[P <: Int, Q <: Int](rhs: T2[T, P, Q]): T2[T, P, Q + 1] =
-      inline Dim.checkT1appendT2[N, P, Q](1) match
-        case true => back.append(lhs, rhs, 1)
-
     inline def append[P <: Int, Q <: Int](
         rhs: T2[T, P, Q],
         axis: 0 | 1
