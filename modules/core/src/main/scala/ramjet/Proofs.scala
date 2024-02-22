@@ -6,11 +6,11 @@ import compiletime.ops.string.*
 import compiletime.ops.int.`*`
 import compiletime.ops.any.ToString as Str
 
-object Dim {
+object Proofs {
 
   // helper to format dimentions to a readable string
-  inline def fmt[I <: Int]: "[" + Str[I] + "]" = constValue
-  inline def fmt[I <: Int, J <: Int]: "[" + Str[I] + ", " + Str[J] + "]" = constValue
+  private inline def fmt[I <: Int]: "[" + Str[I] + "]" = constValue
+  private inline def fmt[I <: Int, J <: Int]: "[" + Str[I] + ", " + Str[J] + "]" = constValue
 
   // Checks if we can reshape an 2d tensor into another one
   inline def checkT2toT2[N <: Int, M <: Int, P <: Int, Q <: Int]: Boolean =

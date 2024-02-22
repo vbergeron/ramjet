@@ -1,6 +1,7 @@
 package ramjet
 
 import reflect.ClassTag
+import Proofs.*
 import compiletime.*
 import compiletime.ops.int.*
 
@@ -39,17 +40,17 @@ final class TensorAPI[Tensor](back: Backend[Tensor]) {
   extension [T <: Scalar, N <: Int](lhs: T1[T, N])
 
     inline def *[P <: Int, Q <: Int](rhs: T2[T, P, Q]): T1[T, P] =
-      inline Dim.checkT1xT2[N, P, Q] match
+      inline checkT1xT2[N, P, Q] match
         case true =>
           back.tensorProduct(lhs, rhs)
 
     inline def *[Q <: Int](rhs: T1[T, Q]): T =
-      inline Dim.checkT1xT1[N, Q] match
+      inline checkT1xT1[N, Q] match
         case true =>
           back.scalarProduct(lhs, rhs)
 
     inline def reshape(p: Int, q: Int): T2[T, p.type, q.type] =
-      inline Dim.checkT1toT2[N, p.type, q.type] match
+      inline checkT1toT2[N, p.type, q.type] match
         case true => back.reshape(lhs, Array(p, q))
 
     inline def append[P <: Int, Q <: Int](
@@ -58,10 +59,10 @@ final class TensorAPI[Tensor](back: Backend[Tensor]) {
     ): Select1[axis.type, T2[T, P + 1, Q], T2[T, P, Q + 1]] =
       inline axis match
         case 0 =>
-          inline Dim.checkT1appendT2[N, P, Q](0) match
+          inline checkT1appendT2[N, P, Q](0) match
             case true => back.append(lhs, rhs, 0).asInstanceOf
         case 1 =>
-          inline Dim.checkT1appendT2[N, P, Q](1) match
+          inline checkT1appendT2[N, P, Q](1) match
             case true => back.append(lhs, rhs, 1).asInstanceOf
 
     inline def d0: N = constValue
@@ -72,21 +73,21 @@ final class TensorAPI[Tensor](back: Backend[Tensor]) {
   extension [T <: Scalar, N <: Int, M <: Int](lhs: T2[T, N, M])
 
     inline def *[P <: Int, Q <: Int](rhs: T2[T, P, Q]): T2[T, N, Q] =
-      inline Dim.checkT2xT2[N, M, P, Q] match
+      inline checkT2xT2[N, M, P, Q] match
         case true =>
           back.tensorProduct(lhs, rhs)
 
     inline def *[Q <: Int](rhs: T1[T, Q]): T1[T, N] =
-      inline Dim.checkT2xT1[N, M, Q] match
+      inline checkT2xT1[N, M, Q] match
         case true =>
           back.tensorProduct(lhs, rhs)
 
     inline def reshape(p: Int, q: Int): T2[T, p.type, q.type] =
-      inline Dim.checkT2toT2[N, M, p.type, q.type] match
+      inline checkT2toT2[N, M, p.type, q.type] match
         case true => back.reshape(lhs, Array(p, q))
 
     inline def reshape(q: Int): T1[T, q.type] =
-      inline Dim.checkT2toT1[N, M, q.type] match
+      inline checkT2toT1[N, M, q.type] match
         case true => back.reshape(lhs, Array(q))
 
     inline def append[Q <: Int](
@@ -95,10 +96,10 @@ final class TensorAPI[Tensor](back: Backend[Tensor]) {
     ): Select1[axis.type, T2[T, N + 1, M], T2[T, N, M + 1]] =
       inline axis match
         case 0 =>
-          inline Dim.checkT2appendT1[N, M, Q](0) match
+          inline checkT2appendT1[N, M, Q](0) match
             case true => back.append(lhs, rhs, 0).asInstanceOf // safe since we checked
         case 1 =>
-          inline Dim.checkT2appendT1[N, M, Q](1) match
+          inline checkT2appendT1[N, M, Q](1) match
             case true => back.append(lhs, rhs, 1).asInstanceOf // safe since we checked
 
     inline def append[P <: Int, Q <: Int](
@@ -107,17 +108,17 @@ final class TensorAPI[Tensor](back: Backend[Tensor]) {
     ): Select1[axis.type, T2[T, N + P, M], T2[T, N, M + Q]] =
       inline axis match
         case 0 =>
-          inline Dim.checkT2appendT2[N, M, P, Q](0) match
+          inline checkT2appendT2[N, M, P, Q](0) match
             case true => back.append(lhs, rhs, 0).asInstanceOf // safe since we checked
         case 1 =>
-          inline Dim.checkT2appendT2[N, M, P, Q](1) match
+          inline checkT2appendT2[N, M, P, Q](1) match
             case true => back.append(lhs, rhs, 1).asInstanceOf // safe since we checked
 
     inline def t: T2[T, M, N] =
       back.transpose(lhs)
 
     inline def inv: T2[T, N, M] =
-      inline Dim.checkSquare[N, M] match
+      inline checkSquare[N, M] match
         case true => back.invert(lhs)
 
     inline def d0: N = constValue
