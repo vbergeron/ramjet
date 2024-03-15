@@ -13,7 +13,7 @@ trait Backend[Tensor] {
   def unsafeF32(data: Array[Float], dims: Array[Int]): Tensor
   def unsafeF64(data: Array[Double], dims: Array[Int]): Tensor
 
-  def scalarProduct[T <: Scalar](lhs: Tensor, rhs: Tensor): T
+  def scalarProduct(lhs: Tensor, rhs: Tensor): Float | Double
 
   /* Tensor product implementation. The implementor MUST match on shapes to handle all the case he desire to handle */
   def tensorProduct(lhs: Tensor, rhs: Tensor): Tensor

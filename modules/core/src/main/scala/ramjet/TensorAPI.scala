@@ -7,6 +7,8 @@ import compiletime.ops.int.*
 
 final class TensorAPI[Tensor](back: Backend[Tensor]) {
 
+  type Scalar = Float | Double
+
   opaque type T1[T <: Scalar, N <: Int] = Tensor
   opaque type T2[T <: Scalar, N <: Int, M <: Int] = Tensor
 
@@ -47,23 +49,19 @@ final class TensorAPI[Tensor](back: Backend[Tensor]) {
     inline def *[Q <: Int](rhs: T1[T, Q]): T =
       inline checkT1xT1[N, Q] match
         case true =>
-          back.scalarProduct(lhs, rhs)
+          back.scalarProduct(lhs, rhs).asInstanceOf
 
     inline def reshape(p: Int, q: Int): T2[T, p.type, q.type] =
       inline checkT1toT2[N, p.type, q.type] match
         case true => back.reshape(lhs, Array(p, q))
 
-    inline def append[P <: Int, Q <: Int](
-        rhs: T2[T, P, Q],
-        axis: 0 | 1
-    ): Select1[axis.type, T2[T, P + 1, Q], T2[T, P, Q + 1]] =
-      inline axis match
-        case 0 =>
-          inline checkT1appendT2[N, P, Q](0) match
-            case true => back.append(lhs, rhs, 0).asInstanceOf
-        case 1 =>
-          inline checkT1appendT2[N, P, Q](1) match
-            case true => back.append(lhs, rhs, 1).asInstanceOf
+    inline def append0[P <: Int, Q <: Int](rhs: T2[T, P, Q]): T2[T, P + 1, Q] =
+      inline checkT1appendT2[N, P, Q](0) match
+        case true => back.append(lhs, rhs, 0).asInstanceOf
+
+    inline def append1[P <: Int, Q <: Int](rhs: T2[T, P, Q]): T2[T, P, Q + 1] =
+      inline checkT1appendT2[N, P, Q](1) match
+        case true => back.append(lhs, rhs, 1).asInstanceOf
 
     inline def d0: N = constValue
 
@@ -90,29 +88,30 @@ final class TensorAPI[Tensor](back: Backend[Tensor]) {
       inline checkT2toT1[N, M, q.type] match
         case true => back.reshape(lhs, Array(q))
 
-    inline def append[Q <: Int](
-        rhs: T1[T, Q],
-        axis: 0 | 1
-    ): Select1[axis.type, T2[T, N + 1, M], T2[T, N, M + 1]] =
-      inline axis match
-        case 0 =>
-          inline checkT2appendT1[N, M, Q](0) match
-            case true => back.append(lhs, rhs, 0).asInstanceOf // safe since we checked
-        case 1 =>
-          inline checkT2appendT1[N, M, Q](1) match
-            case true => back.append(lhs, rhs, 1).asInstanceOf // safe since we checked
+    inline def append0[Q <: Int](rhs: T1[T, Q]): T2[T, N + 1, M] =
+      inline checkT2appendT1[N, M, Q](0) match
+        case true => back.append(lhs, rhs, 0).asInstanceOf
 
-    inline def append[P <: Int, Q <: Int](
-        rhs: T2[T, P, Q],
-        axis: 0 | 1
-    ): Select1[axis.type, T2[T, N + P, M], T2[T, N, M + Q]] =
-      inline axis match
-        case 0 =>
-          inline checkT2appendT2[N, M, P, Q](0) match
-            case true => back.append(lhs, rhs, 0).asInstanceOf // safe since we checked
-        case 1 =>
-          inline checkT2appendT2[N, M, P, Q](1) match
-            case true => back.append(lhs, rhs, 1).asInstanceOf // safe since we checked
+    inline def append1[Q <: Int](rhs: T1[T, Q]): T2[T, N, M + 1] =
+      inline checkT2appendT1[N, M, Q](1) match
+        case true => back.append(lhs, rhs, 1).asInstanceOf
+
+    inline def append0[P <: Int, Q <: Int](rhs: T2[T, P, Q]): T2[T, N + P, M] =
+      inline checkT2appendT2[N, M, P, Q](0) match
+        case true => back.append(lhs, rhs, 0).asInstanceOf // safe since we checked
+
+    inline def append1[P <: Int, Q <: Int](rhs: T2[T, P, Q]): T2[T, N, M + Q] =
+      inline checkT2appendT2[N, M, P, Q](1) match
+        case true => back.append(lhs, rhs, 1).asInstanceOf // safe since we checked
+
+    inline def +(x: T): T2[T, N, M] =
+      ???
+
+    inline def +[Q <: Int](axis: 0 | 1, vec: T1[T, Q]): T2[T, N, M] =
+      ???
+
+    inline def +[P <: Int, Q <: Int](axis: 0 | 1, vec: T2[T, P, Q]): T2[T, N, M] =
+      ???
 
     inline def t: T2[T, M, N] =
       back.transpose(lhs)
