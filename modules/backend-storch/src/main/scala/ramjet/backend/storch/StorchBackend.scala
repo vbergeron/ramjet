@@ -25,8 +25,6 @@ object StorchBackend extends Backend[Tensor] {
         case 1 => if t.dim() == 1 then t.reshape(t.shape()(0), 1) else t
         case _ => throw IllegalArgumentException("Only tensor up to size 2 are supported")
 
-    println(s"${lhs.shape().toList}, ${rhs.shape().toList}, $axis")
-    println(s"${adapt(lhs).shape().toList}, ${adapt(rhs).shape().toList}, $axis")
     global.torch.cat(new TensorArrayRef(new TensorVector(adapt(rhs), adapt(rhs))), axis.toLong)
 
   def invert(lhs: Tensor): Tensor =
