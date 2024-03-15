@@ -49,30 +49,30 @@ object Proofs {
     inline if constValue[N == M] then true
     else error("Not a square 2D tensor : " + fmt[N, M])
 
-  inline def checkT2appendT1[N <: Int, M <: Int, Q <: Int](axis: 0 | 1): Boolean =
+  inline def checkT2appendT1[N <: Int, M <: Int, Q <: Int](axis: 0 | 1): Unit =
     inline axis match
       case 0 =>
-        inline if constValue[M == Q] then true
+        inline if constValue[M == Q] then ()
         else error(fmt[N, M] + " does not have " + fmt[Q] + " columns")
       case 1 =>
-        inline if constValue[N == Q] then true
+        inline if constValue[N == Q] then ()
         else error(fmt[N, M] + " does not have " + fmt[Q] + " lines")
 
-  inline def checkT2appendT2[N <: Int, M <: Int, P <: Int, Q <: Int](axis: 0 | 1): Boolean =
+  inline def checkT2appendT2[N <: Int, M <: Int, P <: Int, Q <: Int](axis: 0 | 1): Unit =
     inline axis match
       case 0 =>
-        inline if constValue[M == Q] then true
+        inline if constValue[M == Q] then ()
         else error(fmt[N, M] + " and " + fmt[P, Q] + " have not the same number of columns")
       case 1 =>
-        inline if constValue[N == P] then true
+        inline if constValue[N == P] then ()
         else error(fmt[N, M] + " and " + fmt[P, Q] + " have not the same number of lines")
 
-  inline def checkT1appendT2[N <: Int, P <: Int, Q <: Int](axis: 0 | 1): Boolean =
+  inline def checkT1appendT2[N <: Int, P <: Int, Q <: Int](axis: 0 | 1): Unit =
     inline axis match
       case 0 =>
-        inline if constValue[N == Q] then true
+        inline if constValue[N == Q] then ()
         else error(fmt[P, Q] + " does not have " + fmt[N] + " columns")
       case 1 =>
-        inline if constValue[N == P] then true
+        inline if constValue[N == P] then ()
         else error(fmt[P, Q] + " does not have " + fmt[N] + " lines")
 }
