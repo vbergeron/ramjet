@@ -66,7 +66,7 @@ Concatenating matrices and vector or dimentions is supported :
 val A = fill(2, 10)(1f)
 
 val B: T2[Float, 4, 10] = A.append(A, 0) // append on the first axis, rows
-val C: T2[Float, 2, 20] = A.append(A, 1) // append on the second axis, rows
+val C: T2[Float, 2, 20] = A.append(A, 1) // append on the second axis, columns
 
 // Vectors are also supported
 
